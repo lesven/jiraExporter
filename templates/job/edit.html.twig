@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ job.name }} bearbeiten - JiraExporter{% endblock %}
+
+{% block body %}
+    <h1>Job bearbeiten: {{ job.name }}</h1>
+
+    {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Job-Informationen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        {{ form_label(form.name) }}
+                        {{ form_widget(form.name) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">JQL-Abfrage</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        {{ form_label(form.jql) }}
+                        {{ form_widget(form.jql) }}
+                        {{ form_errors(form.jql) }}
+                        <div class="form-text">
+                            <strong>Beispiele:</strong><br>
+                            • <code>project = "ABC" AND status = "Open"</code><br>
+                            • <code>assignee = currentUser() AND created >= -7d</code><br>
+                            • <code>priority = "High" AND resolution = Unresolved</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('job_show', {id: job.id}) }}" class="btn btn-secondary">Abbrechen</a>
+                <button type="submit" class="btn btn-primary">Änderungen speichern</button>
+            </div>
+        </div>
+    {{ form_end(form) }}
+
+    <div class="mt-4">
+        <a href="{{ path('job_show', {id: job.id}) }}" class="btn btn-outline-secondary">← Zurück zum Job</a>
+    </div>
+{% endblock %}

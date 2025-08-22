@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ job.name }} - JiraExporter{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ job.name }}</h1>
+        <div>
+            <a href="{{ path('job_edit', {id: job.id}) }}" class="btn btn-outline-secondary">Bearbeiten</a>
+            <form method="post" action="{{ path('job_run', {id: job.id}) }}" class="d-inline">
+                <button type="submit" class="btn btn-primary">Jetzt ausführen</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Job Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-3">ID:</dt>
+                        <dd class="col-sm-9">{{ job.id }}</dd>
+                        
+                        <dt class="col-sm-3">Name:</dt>
+                        <dd class="col-sm-9">{{ job.name }}</dd>
+                        
+                        <dt class="col-sm-3">Beschreibung:</dt>
+                        <dd class="col-sm-9">{{ job.description ?? 'Keine Beschreibung' }}</dd>
+                        
+                        <dt class="col-sm-3">JQL:</dt>
+                        <dd class="col-sm-9"><code>{{ job.jql }}</code></dd>
+                        
+                        <dt class="col-sm-3">Erstellt:</dt>
+                        <dd class="col-sm-9">{{ job.createdAt|date('d.m.Y H:i:s') }}</dd>
+                        
+                        <dt class="col-sm-3">Aktualisiert:</dt>
+                        <dd class="col-sm-9">{{ job.updatedAt|date('d.m.Y H:i:s') }}</dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Letzte Logs</h5>
+                </div>
+                <div class="card-body">
+                    {% if logs is empty %}
+                        <p class="text-muted">Dieser Job wurde noch nicht ausgeführt.</p>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Gestartet</th>
+                                        <th>Beendet</th>
+                                        <th>Status</th>
+                                        <th>Issues</th>
+                                        <th>Dauer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in logs %}
+                                        <tr>
+                                            <td>{{ log.startedAt|date('d.m.Y H:i:s') }}</td>
+                                            <td>{{ log.finishedAt ? log.finishedAt|date('d.m.Y H:i:s') : 'Läuft...' }}</td>
+                                            <td>
+                                                {% if log.status == 'ok' %}
+                                                    <span class="badge bg-success">OK</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Fehler</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ log.issueCount ?? '-' }}</td>
+                                            <td>
+                                                {% if log.durationInSeconds %}
+                                                    {{ log.durationInSeconds }}s
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% if log.errorMessage %}
+                                            <tr>
+                                                <td colspan="5">
+                                                    <small class="text-danger">Fehler: {{ log.errorMessage }}</small>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Aktionen</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{{ path('job_run', {id: job.id}) }}" class="mb-3">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-play-fill"></i> Export ausführen
+                        </button>
+                        <small class="form-text text-muted">Führt den Export sofort aus und lädt die CSV-Datei herunter.</small>
+                    </form>
+
+                    <a href="{{ path('job_edit', {id: job.id}) }}" class="btn btn-outline-secondary w-100 mb-2">
+                        <i class="bi bi-pencil"></i> Job bearbeiten
+                    </a>
+
+                    <form method="post" action="{{ path('job_delete', {id: job.id}) }}" onsubmit="return confirm('Sind Sie sicher, dass Sie diesen Job löschen möchten?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ job.id) }}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-trash"></i> Job löschen
+                        </button>
+                    </form>
+                    <small class="form-text text-muted">Löscht nur den Job, nicht die Logs.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="{{ path('job_index') }}" class="btn btn-secondary">← Zurück zu Jobs</a>
+    </div>
+{% endblock %}

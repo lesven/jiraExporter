@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard - JiraExporter{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Dashboard</h1>
+        <a href="{{ path('job_new') }}" class="btn btn-primary">Neuen Job erstellen</a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Jobs</h5>
+                </div>
+                <div class="card-body">
+                    {% if jobs is empty %}
+                        <p class="text-muted">Noch keine Jobs erstellt.</p>
+                        <a href="{{ path('job_new') }}" class="btn btn-primary">Ersten Job erstellen</a>
+                    {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Erstellt</th>
+                                        <th>Aktionen</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for job in jobs %}
+                                        <tr>
+                                            <td>{{ job.id }}</td>
+                                            <td>
+                                                <a href="{{ path('job_show', {id: job.id}) }}">{{ job.name }}</a>
+                                                {% if job.description %}
+                                                    <br><small class="text-muted">{{ job.description }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ job.createdAt|date('d.m.Y H:i') }}</td>
+                                            <td>
+                                                <a href="{{ path('job_show', {id: job.id}) }}" class="btn btn-sm btn-outline-primary">Anzeigen</a>
+                                                <a href="{{ path('job_edit', {id: job.id}) }}" class="btn btn-sm btn-outline-secondary">Bearbeiten</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Letzte Exporte</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_logs is empty %}
+                        <p class="text-muted">Noch keine Exporte durchgeführt.</p>
+                    {% else %}
+                        {% for log in recent_logs %}
+                            <div class="d-flex justify-content-between align-items-center py-2 {% if not loop.last %}border-bottom{% endif %}">
+                                <div>
+                                    <strong>{{ log.jobName }}</strong><br>
+                                    <small class="text-muted">{{ log.startedAt|date('d.m.Y H:i') }}</small>
+                                </div>
+                                <div>
+                                    {% if log.status == 'ok' %}
+                                        <span class="badge bg-success">{{ log.issueCount }} Issues</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Fehler</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

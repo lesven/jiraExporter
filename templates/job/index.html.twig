@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Jobs - JiraExporter{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Jobs</h1>
+        <a href="{{ path('job_new') }}" class="btn btn-primary">Neuen Job erstellen</a>
+    </div>
+
+    {% if jobs is empty %}
+        <div class="text-center py-5">
+            <h3 class="text-muted">Noch keine Jobs erstellt</h3>
+            <p class="text-muted">Erstellen Sie Ihren ersten Job, um mit dem Exportieren zu beginnen.</p>
+            <a href="{{ path('job_new') }}" class="btn btn-primary">Ersten Job erstellen</a>
+        </div>
+    {% else %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>JQL</th>
+                                <th>Erstellt</th>
+                                <th>Aktualisiert</th>
+                                <th>Aktionen</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                                <tr>
+                                    <td>{{ job.id }}</td>
+                                    <td>
+                                        <strong>{{ job.name }}</strong>
+                                        {% if job.description %}
+                                            <br><small class="text-muted">{{ job.description }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <code class="small">{{ job.jql|length > 50 ? job.jql|slice(0, 50) ~ '...' : job.jql }}</code>
+                                    </td>
+                                    <td>{{ job.createdAt|date('d.m.Y H:i') }}</td>
+                                    <td>{{ job.updatedAt|date('d.m.Y H:i') }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('job_show', {id: job.id}) }}" class="btn btn-outline-primary">Anzeigen</a>
+                                            <a href="{{ path('job_edit', {id: job.id}) }}" class="btn btn-outline-secondary">Bearbeiten</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

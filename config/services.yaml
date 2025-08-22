@@ -1,0 +1,29 @@
+parameters:
+    jira.base_url: '%env(JIRA_BASE_URL)%'
+    jira.username: '%env(JIRA_USERNAME)%'
+    jira.password: '%env(JIRA_PASSWORD)%'
+    jira.verify_tls: '%env(bool:JIRA_VERIFY_TLS)%'
+    export.base_dir: '%env(EXPORT_BASE_DIR)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\JiraClient:
+        arguments:
+            $baseUrl: '%jira.base_url%'
+            $username: '%jira.username%'
+            $password: '%jira.password%'
+            $verifyTls: '%jira.verify_tls%'
+
+    App\Service\CsvExporter:
+        arguments:
+            $exportBaseDir: '%export.base_dir%'
