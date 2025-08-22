@@ -21,7 +21,7 @@ class CsvExporter
         
         // Ensure export directory exists
         if (!is_dir($directory)) {
-            if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+            if (!@mkdir($directory, 0755, true) && !is_dir($directory)) {
                 throw new \RuntimeException("Export-Verzeichnis konnte nicht erstellt werden: $directory");
             }
         }
