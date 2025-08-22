@@ -21,7 +21,12 @@ class CsvExporter
         
         // Ensure export directory exists
         if (!is_dir($directory)) {
-            mkdir($directory, 0755, true);
+            if (!mkdir($directory, 0755, true) && !is_dir($directory)) {
+                throw new \RuntimeException("Export-Verzeichnis konnte nicht erstellt werden: $directory");
+            }
+        }
+        if (!is_writable($directory)) {
+            throw new \RuntimeException("Export-Verzeichnis ist nicht beschreibbar: $directory");
         }
 
         // Generate filename if not provided
@@ -40,7 +45,9 @@ class CsvExporter
         $csvContent = $this->generateCsvContent($issues);
 
         // Write to file with proper encoding (UTF-8 without BOM)
-        file_put_contents($filePath, $csvContent);
+        if (file_put_contents($filePath, $csvContent) === false) {
+            throw new \RuntimeException("CSV-Datei konnte nicht geschrieben werden: $filePath");
+        }
 
         $this->logger->info('CSV export completed', [
             'file_path' => $filePath,
