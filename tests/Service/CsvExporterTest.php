@@ -27,7 +27,7 @@ class CsvExporterTest extends TestCase
         
         // Should have header only
         $this->assertCount(1, $lines);
-        $this->assertStringContainsString('key', $lines[0]);
+        $this->assertStringContainsString('Key', $lines[0]); // Case-sensitive: "Key" not "key"
         
         unlink($filePath);
     }

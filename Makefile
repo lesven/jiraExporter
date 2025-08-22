@@ -49,7 +49,7 @@ clean: ## Stoppt Container und entfernt alle Daten (Volumes, Images, etc.)
 
 # Tests ausführen
 test: ## Führt alle PHPUnit-Tests aus
-	@echo "🧪 Führe Tests aus..."
+	@echo "Führe Tests aus..."
 	docker-compose exec php php bin/phpunit
 
 # Abhängigkeiten installieren
