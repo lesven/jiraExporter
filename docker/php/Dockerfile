@@ -8,7 +8,10 @@ RUN apk add --no-cache \
     unzip \
     libzip-dev \
     icu-dev \
-    oniguruma-dev
+    oniguruma-dev \
+    autoconf \
+    g++ \
+    make
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -17,6 +20,9 @@ RUN docker-php-ext-install \
     zip \
     intl \
     mbstring
+
+# Install PCOV for code coverage (optional, can be installed later)
+RUN pecl install pcov && docker-php-ext-enable pcov
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

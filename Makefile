@@ -1,7 +1,7 @@
 # JiraExporter Makefile
 # Vereinfacht die Verwaltung der Docker-Container und Anwendung
 
-.PHONY: help deploy build up down clean test install migrate logs shell composer-install composer-update health
+.PHONY: help deploy build up down clean test coverage coverage-setup install migrate logs shell composer-install composer-update health
 
 # Standard-Target
 .DEFAULT_GOAL := help
@@ -51,6 +51,52 @@ clean: ## Stoppt Container und entfernt alle Daten (Volumes, Images, etc.)
 test: ## Führt alle PHPUnit-Tests aus
 	@echo "Fuehre Tests aus..."
 	docker-compose exec php php bin/phpunit
+
+# Test Coverage generieren
+coverage: ## Generiert Test Coverage Report (benötigt Xdebug oder PCOV)
+	@echo "Generiere Test Coverage..."
+	@echo "Prüfe verfügbare Coverage Driver..."
+	@if docker-compose exec php php -m | grep -q "pcov\|xdebug"; then \
+		echo "Coverage Driver gefunden, starte Coverage..."; \
+		docker-compose exec php php -d memory_limit=512M bin/phpunit --coverage-html coverage-html --coverage-text --coverage-clover coverage.xml; \
+		echo ""; \
+		echo "Coverage Berichte generiert:"; \
+		echo "  - HTML: coverage-html/index.html"; \
+		echo "  - Text: coverage.txt"; \
+		echo "  - XML:  coverage.xml"; \
+	else \
+		echo "❌ Kein Coverage Driver (Xdebug oder PCOV) installiert!"; \
+		echo ""; \
+		echo "Zur Installation von PCOV (empfohlen für Tests):"; \
+		echo "  docker-compose exec php pecl install pcov"; \
+		echo "  docker-compose exec php docker-php-ext-enable pcov"; \
+		echo "  docker-compose restart php"; \
+		echo ""; \
+		echo "Alternativ für Xdebug:"; \
+		echo "  docker-compose exec php pecl install xdebug"; \
+		echo "  docker-compose exec php docker-php-ext-enable xdebug"; \
+		echo "  docker-compose restart php"; \
+		echo ""; \
+		echo "Führe Tests ohne Coverage aus..."; \
+		docker-compose exec php php bin/phpunit; \
+	fi
+
+# Coverage Setup (Container neu bauen)
+coverage-setup: ## Baut Container mit PCOV neu für Coverage-Reports
+	@echo "Baue Container mit PCOV für Test Coverage..."
+	@echo "Dies installiert automatisch PCOV Extension..."
+	$(MAKE) build
+	$(MAKE) up
+	@echo "Warte auf Container-Start..."
+	@sleep 5
+	@echo "PCOV ist jetzt verfügbar! Verwende 'make coverage' für Reports."
+	@echo ""
+	@echo "Teste Coverage-Setup:"
+	@if docker-compose exec php php -m | grep -q pcov; then \
+		echo "✅ PCOV erfolgreich installiert!"; \
+	else \
+		echo "❌ PCOV Installation fehlgeschlagen"; \
+	fi
 
 # Abhängigkeiten installieren
 composer-install: ## Installiert Composer-Abhängigkeiten
