@@ -2,7 +2,7 @@
 
 ## Überblick
 Ziel: Symfony-7.2-App (PHP 8.3), die eine lokale **Jira v7.10** via **JQL** abfragt und Ergebnisse als **CSV** exportiert.  
-Nutzung per **CLI/Cron** und schlankem **Admin-UI** (DE). Eine **Jira-Instanz** global, **Basic Auth**, optional ohne TLS-Prüfung.
+Nutzung per **CLI/Cron** und schlankem **Admin-UI** (DE) in Twitter Bootstrap. Eine **Jira-Instanz** global, **Basic Auth**, optional ohne TLS-Prüfung.
 
 ---
 
