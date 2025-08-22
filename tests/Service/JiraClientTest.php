@@ -192,7 +192,8 @@ class JiraClientTest extends TestCase
     {
         $this->mockHandler->append(new Response(200, [], 'invalid json'));
 
-        $this->expectException(\TypeError::class);
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Invalid JSON response from Jira API');
 
         $this->jiraClient->searchIssues('project = TEST');
     }

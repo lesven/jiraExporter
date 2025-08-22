@@ -59,6 +59,10 @@ class JiraClient
 
                 $data = json_decode($response->getBody()->getContents(), true);
                 
+                if (!is_array($data) || !isset($data['total']) || !isset($data['issues'])) {
+                    throw new \RuntimeException('Invalid JSON response from Jira API');
+                }
+                
                 if ($total === null) {
                     $total = $data['total'];
                 }
